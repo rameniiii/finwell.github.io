@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Wellness Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f7ff;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c5282;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .question {
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        .question h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #2d3748;
+            font-weight: 500;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background-color: #f8f9fa;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background-color: #e6f2ff;
+            border-color: #3182ce;
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background-color: #3182ce;
+            color: white;
+            border-color: #3182ce;
+        }
+
+        .progress-bar {
+            background-color: #e2e8f0;
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress {
+            background-color: #3182ce;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: #2c5282;
+        }
+
+        button:disabled {
+            background-color: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .results {
+            display: none;
+            text-align: center;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #2c5282;
+        }
+
+        .result-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+
+        .result-tips {
+            text-align: left;
+            background-color: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .result-tips h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .result-tips ul {
+            list-style-position: inside;
+            color: #4a5568;
+        }
+
+        .result-tips li {
+            margin-bottom: 10px;
+        }
+
+        .start-screen {
+            text-align: center;
+            display: block;
+        }
+
+        .start-screen.hidden {
+            display: none;
+        }
+
+        .start-screen p {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .score-breakdown {
+            background-color: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        .score-bar {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #e2e8f0;
+            margin: 0 10px;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .score-fill {
+            height: 100%;
+            background-color: #48bb78;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .wellness-level {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Financial Wellness Assessment</h1>
+        
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+
+        <div class="start-screen">
+            <p>Take this quick assessment to evaluate your financial wellness and get personalized recommendations for improving your financial health.</p>
+            <button onclick="startQuiz()">Start Assessment</button>
+        </div>
+
+        <div class="question" data-question="1">
+            <h2>Do you have an emergency fund?</h2>
+            <div class="options">
+                <div class="option" data-score="4" data-category="emergency">Yes, 6+ months of expenses</div>
+                <div class="option" data-score="3" data-category="emergency">Yes, 3-6 months of expenses</div>
+                <div class="option" data-score="2" data-category="emergency">Yes, 1-3 months of expenses</div>
+                <div class="option" data-score="1" data-category="emergency">Less than 1 month</div>
+                <div class="option" data-score="0" data-category="emergency">No emergency fund</div>
+            </div>
+        </div>
+
+        <div class="question" data-question="2">
+            <h2>How well do you stick to a budget?</h2>
+            <div class="options">
+                <div class="option" data-score="4" data-category="budgeting">I track all expenses and follow my budget strictly</div>
+                <div class="option" data-score="3" data-category="budgeting">I have a budget and mostly stick to it</div>
+                <div class="option" data-score="2" data-category="budgeting">I have a rough budget but don't always follow it</div>
+                <div class="option" data-score="1" data-category="budgeting">I try to watch my spending but don't have a formal budget</div>
+                <div class="option" data-score="0" data-category="budgeting">I don't budget at all</div>
+            </div>
+        </div>
+
+        <div class="question" data-question="3">
+            <h2>What percentage of your income do you save?</h2>
+            <div class="options">
+                <div class="option" data-score="4" data-category="savings">20% or more</div>
+                <div class="option" data-score="3" data-category="savings">15-19%</div>
+                <div class="option" data-score="2" data-category="savings">10-14%</div>
+                <div class="option" data-score="1" data-category="savings">5-9%</div>
+                <div class="option" data-score="0" data-category="savings">Less than 5%</div>
+            </div>
+        </div>
+
+        <div class="question" data-question="4">
+            <h2>How would you describe your debt situation?</h2>
+            <div class="options">
+                <div class="option" data-score="4" data-category="debt">No debt or only low-interest mortgage</div>
+                <div class="option" data-score="3" data-category="debt">Manageable debt with a clear payoff plan</div>
+                <div class="option" data-score="2" data-category="debt">Some debt but managing payments</div>
+                <div class="option" data-score="1" data-category="debt">Struggling with debt payments</div>
+                <div class="option" data-score="0" data-category="debt">Overwhelming debt</div>
+            </div>
+        </div>
+
+        <div class="question" data-question="5">
+            <h2>Are you saving for retirement?</h2>
+            <div class="options">
+                <div class="option" data-score="4" data-category="retirement">Yes, contributing 15%+ with employer match</div>
+                <div class="option" data-score="3" data-category="retirement">Yes, contributing 10-14%</div>
+                <div class="option" data-score="2" data-category="retirement">Yes, contributing 5-9%</div>
+                <div class="option" data-score="1" data-category="retirement">Yes, but less than 5%</div>
+                <div class="option" data-score="0" data-category="retirement">Not saving for retirement</div>
+            </div>
+        </div>
+
+        <div class="question" data-question="6">
+            <h2>How confident do you feel about your financial knowledge?</h2>
+            <div class="options">
+                <div class="option" data-score="4" data-category="knowledge">Very confident - I understand investing, taxes, and financial planning</div>
+                <div class="option" data-score="3" data-category="knowledge">Confident - I understand the basics well</div>
+                <div class="option" data-score="2" data-category="knowledge">Somewhat confident - I know some basics</div>
+                <div class="option" data-score="1" data-category="knowledge">Not very confident - I struggle with financial concepts</div>
+                <div class="option" data-score="0" data-category="knowledge">Not confident at all</div>
+            </div>
+        </div>
+
+        <div class="results">
+            <h2 class="result-title">Your Financial Wellness Score</h2>
+            <div class="wellness-level"></div>
+            <p class="result-description"></p>
+            
+            <div class="score-breakdown">
+                <h3>Score Breakdown:</h3>
+                <div class="score-item">
+                    <span>Emergency Fund</span>
+                    <div class="score-bar">
+                        <div class="score-fill" data-category="emergency"></div>
+                    </div>
+                    <span class="score-value" data-category="emergency"></span>
+                </div>
+                <div class="score-item">
+                    <span>Budgeting</span>
+                    <div class="score-bar">
+                        <div class="score-fill" data-category="budgeting"></div>
+                    </div>
+                    <span class="score-value" data-category="budgeting"></span>
+                </div>
+                <div class="score-item">
+                    <span>Savings</span>
+                    <div class="score-bar">
+                        <div class="score-fill" data-category="savings"></div>
+                    </div>
+                    <span class="score-value" data-category="savings"></span>
+                </div>
+                <div class="score-item">
+                    <span>Debt Management</span>
+                    <div class="score-bar">
+                        <div class="score-fill" data-category="debt"></div>
+                    </div>
+                    <span class="score-value" data-category="debt"></span>
+                </div>
+                <div class="score-item">
+                    <span>Retirement</span>
+                    <div class="score-bar">
+                        <div class="score-fill" data-category="retirement"></div>
+                    </div>
+                    <span class="score-value" data-category="retirement"></span>
+                </div>
+                <div class="score-item">
+                    <span>Financial Knowledge</span>
+                    <div class="score-bar">
+                        <div class="score-fill" data-category="knowledge"></div>
+                    </div>
+                    <span class="score-value" data-category="knowledge"></span>
+                </div>
+            </div>
+            
+            <div class="result-tips">
+                <h3>Recommended Next Steps:</h3>
+                <ul class="tips-list"></ul>
+            </div>
+            
+            <button onclick="resetQuiz()">Take Again</button>
+        </div>
+
+        <div class="navigation">
+            <button onclick="previousQuestion()" id="prevBtn" style="display: none;">Previous</button>
+            <button onclick="nextQuestion()" id="nextBtn" style="display: none;" disabled>Next</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let scores = {
+            emergency: 0,
+            budgeting: 0,
+            savings: 0,
+            debt: 0,
+            retirement: 0,
+            knowledge: 0
+        };
+        const totalQuestions = 6;
+
+        const wellnessLevels = [
+            {
+                min: 0,
+                max: 6,
+                level: "Needs Immediate Attention",
+                color: "#e53e3e",
+                description: "Your financial wellness needs significant improvement. Don't worry - everyone starts somewhere! Focus on building basic financial habits.",
+                tips: [
+                    "Start tracking your expenses for one month to understand where your money goes",
+                    "Create a simple budget using the 50/30/20 rule (50% needs, 30% wants, 20% savings)",
+                    "Open a separate savings account and set up automatic transfers, even if it's just $25/month",
+                    "List all your debts and create a plan to tackle them, starting with the highest interest rate",
+                    "Take advantage of free financial literacy resources online or at your local library"
+                ]
+            },
+            {
+                min: 7,
+                max: 12,
+                level: "Building Foundation",
+                color: "#dd6b20",
+                description: "You're making progress on your financial journey. Keep building on these foundations to improve your financial security.",
+                tips: [
+                    "Work on building your emergency fund to at least $1,000 as a starter goal",
+                    "Review and optimize your budget monthly to find areas where you can cut back",
+                    "Increase your savings rate by 1% every few months until you reach 10%",
+                    "If you have high-interest debt, consider the debt snowball or avalanche method",
+                    "Start learning about investing basics through books, podcasts, or online courses"
+                ]
+            },
+            {
+                min: 13,
+                max: 18,
+                level: "On Track",
+                color: "#d69e2e",
+                description: "You're doing well with your finances! Continue strengthening your financial position and planning for the future.",
+                tips: [
+                    "Aim to build your emergency fund to 3-6 months of expenses",
+                    "Automate your finances as much as possible (bills, savings, investments)",
+                    "Increase your retirement contributions to at least 10-15% of income",
+                    "Consider opening investment accounts beyond retirement (brokerage account)",
+                    "Review your insurance coverage to ensure adequate protection",
+                    "Start thinking about medium-term financial goals (house, car, vacation)"
+                ]
+            },
+            {
+                min: 19,
+                max: 24,
+                level: "Excellent Financial Health",
+                color: "#48bb78",
+                description: "Congratulations! You have excellent financial wellness. Keep up the great work and consider helping others on their journey.",
+                tips: [
+                    "Maximize tax-advantaged retirement accounts (401k, IRA, HSA)",
+                    "Develop a comprehensive investment strategy aligned with your goals",
+                    "Consider advanced strategies like tax-loss harvesting or backdoor Roth IRA",
+                    "Plan for major life events (children's education, early retirement)",
+                    "Explore estate planning and ensure you have proper documentation",
+                    "Share your knowledge with others or consider financial mentoring"
+                ]
+            }
+        ];
+
+        function startQuiz() {
+            // Hide start screen
+            document.querySelector('.start-screen').classList.add('hidden');
+            
+            // Show first question
+            const firstQuestion = document.querySelector('.question[data-question="1"]');
+            firstQuestion.classList.add('active');
+            
+            // Show next button
+            document.getElementById('nextBtn').style.display = 'block';
+            
+            // Initialize current question to 0
+            currentQuestion = 0;
+            
+            // Update progress bar
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+            document.querySelector('.progress').style.width = progress + '%';
+        }
+
+        function selectOption(option) {
+            const question = option.closest('.question');
+            
+            // Remove previous selection
+            question.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection
+            option.classList.add('selected');
+            
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            const questions = document.querySelectorAll('.question');
+            const currentQ = questions[currentQuestion];
+            const selected = currentQ.querySelector('.option.selected');
+            
+            if (selected) {
+                // Store score
+                const score = parseInt(selected.dataset.score);
+                const category = selected.dataset.category;
+                scores[category] = score;
+            }
+            
+            if (currentQuestion < totalQuestions - 1) {
+                // Hide current question
+                questions[currentQuestion].classList.remove('active');
+                
+                // Move to next question
+                currentQuestion++;
+                questions[currentQuestion].classList.add('active');
+                
+                // Show/hide navigation buttons
+                if (currentQuestion > 0) {
+                    document.getElementById('prevBtn').style.display = 'block';
+                }
+                
+                if (currentQuestion === totalQuestions - 1) {
+                    document.getElementById('nextBtn').textContent = 'Get Results';
+                }
+                
+                // Disable next if no selection in new question
+                const nextQ = questions[currentQuestion];
+                const hasSelection = nextQ.querySelector('.option.selected');
+                document.getElementById('nextBtn').disabled = !hasSelection;
+                
+            } else {
+                showResults();
+            }
+            
+            updateProgress();
+        }
+
+        function previousQuestion() {
+            const questions = document.querySelectorAll('.question');
+            
+            if (currentQuestion > 0) {
+                questions[currentQuestion].classList.remove('active');
+                currentQuestion--;
+                questions[currentQuestion].classList.add('active');
+                
+                // Update navigation buttons
+                if (currentQuestion === 0) {
+                    document.getElementById('prevBtn').style.display = 'none';
+                }
+                document.getElementById('nextBtn').textContent = 'Next';
+                document.getElementById('nextBtn').disabled = false;
+            }
+            
+            updateProgress();
+        }
+
+        function showResults() {
+            // Hide last question and navigation
+            document.querySelector('.question.active').classList.remove('active');
+            document.querySelector('.navigation').style.display = 'none';
+            
+            // Calculate total score
+            const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+            
+            // Determine wellness level
+            const level = wellnessLevels.find(l => totalScore >= l.min && totalScore <= l.max);
+            
+            // Update results display
+            document.querySelector('.wellness-level').textContent = level.level;
+            document.querySelector('.wellness-level').style.color = level.color;
+            document.querySelector('.result-description').textContent = level.description;
+            
+            // Create tips list
+            const tipsList = document.querySelector('.tips-list');
+            tipsList.innerHTML = level.tips.map(tip => `<li>${tip}</li>`).join('');
+            
+            // Update score breakdown
+            Object.keys(scores).forEach(category => {
+                const scoreValue = scores[category];
+                const percentage = (scoreValue / 4) * 100;
+                
+                const fillBar = document.querySelector(`.score-fill[data-category="${category}"]`);
+                const valueSpan = document.querySelector(`.score-value[data-category="${category}"]`);
+                
+                fillBar.style.width = percentage + '%';
+                valueSpan.textContent = scoreValue + '/4';
+                
+                // Color code based on score
+                if (scoreValue >= 3) {
+                    fillBar.style.backgroundColor = '#48bb78';
+                } else if (scoreValue >= 2) {
+                    fillBar.style.backgroundColor = '#d69e2e';
+                } else {
+                    fillBar.style.backgroundColor = '#e53e3e';
+                }
+            });
+            
+            // Show results
+            document.querySelector('.results').classList.add('active');
+            
+            // Update progress to 100%
+            document.querySelector('.progress').style.width = '100%';
+        }
+
+        function resetQuiz() {
+            currentQuestion = 0;
+            scores = {
+                emergency: 0,
+                budgeting: 0,
+                savings: 0,
+                debt: 0,
+                retirement: 0,
+                knowledge: 0
+            };
+            
+            // Hide results
+            document.querySelector('.results').classList.remove('active');
+            
+            // Reset questions
+            document.querySelectorAll('.question').forEach(q => {
+                q.classList.remove('active');
+                q.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+            });
+            
+            // Show start screen  
+            document.querySelector('.start-screen').classList.remove('hidden');
+            
+            // Reset navigation
+            document.querySelector('.navigation').style.display = 'flex';
+            document.getElementById('prevBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('nextBtn').textContent = 'Next';
+            document.getElementById('nextBtn').disabled = true;
+            
+            // Reset progress
+            document.querySelector('.progress').style.width = '0%';
+        }
+
+        // Add click event listeners to options
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    selectOption(this);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
